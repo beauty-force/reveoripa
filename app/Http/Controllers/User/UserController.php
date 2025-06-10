@@ -906,7 +906,6 @@ class UserController extends Controller
         $succeed = $user->consume_point >= $limit;
         $mark_pos = $limit == 0 ? 0 : 50;
         $current_pos = $this->getRate($limit, $next_rank->limit, $user->consume_point);
-        var_dump($current_pos);
         return inertia('User/Profile', compact('hide_cat_bar', 'ranks', 'mark_pos', 'current_pos', 'succeed'));
     }
 }
