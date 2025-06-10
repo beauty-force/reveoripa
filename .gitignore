@@ -25,7 +25,6 @@ yarn-error.log
 /*.txt
 /*.log
 /*.csv
-/*.json
 /*.php
 /*.html
 /*.css
