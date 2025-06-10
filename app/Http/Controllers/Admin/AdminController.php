@@ -473,17 +473,13 @@ class AdminController extends Controller
             'terms' => '利用規約',
             'privacy' => 'プライバシーポリシー',
             'notation' => '特定商取引法に基づく表記',
-            'partner_store' => '提携店舗様',
-            'partner_site' => '提携サイト様',
-            // 'footer' => 'フッター'
+            
         ];
         $contents = [
             'terms' => getOption('terms'),
             'privacy' => getOption('privacy'),
             'notation' => getOption('notation'),
-            'partner_store' => getOption('partner_store'),
-            'partner_site' => getOption('partner_site'),
-            // 'footer' => getOption('footer')
+            
         ];
         $hide_cat_bar = 1;
         return inertia('Admin/Pages', compact('titles', 'contents', 'hide_cat_bar'));
