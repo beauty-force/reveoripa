@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@font-face {
+    font-family: 'kei-font';
+    src: url('/fonts/keifont.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'mplus2';
+    src: url('/fonts/MPLUS2.ttf') format('truetype');
+    font-style: normal;
+}
+/* PC */
+.footer_padding {
+    padding-bottom: 150px;
+}
+
+.bg-custom {
+    background: #F5F5F5;
+}
+
+/* Mobile */
+@media only screen and (max-width: 768px) {  
+    .footer_padding {
+        padding-bottom: 180px;
+    }
+}
+
+@media only screen and (max-width: 640px) {  
+    .footer_padding {
+        padding-bottom: 180px;
+    }
+}
+
+
+.category_bar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.category_bar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 0.3rem;
+    height: 0.5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #e11d48;
+    border-radius: 0;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #be123c;
+}
+
+.bg-theme {
+    background: linear-gradient(0deg, #d68d2f, #fac239);
+    border: solid #76171566;
+    border-width: 1px!important;
+}
+
+.bg-theme-hover:hover {
+    background: linear-gradient(180deg, #d68d2f, #fac239);
+}
+
+@media only screen and (max-width: 768px) {
+    .carousel__pagination {
+        margin-top: 3px!important;
+        margin-bottom: 3px!important;
+    }
+}

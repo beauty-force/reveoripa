@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+  <style>
+    .reve-text {
+      font-family: 'Arial', sans-serif;
+      font-size: 48px;
+      font-weight: bold;
+      fill: #333;
+    }
+    .oripa-text {
+      font-family: 'MS Gothic', 'Hiragino Kaku Gothic Pro', sans-serif;
+      font-size: 36px;
+      fill: #666;
+    }
+  </style>
+  
+  <!-- Reve text -->
+  <text x="20" y="70" class="reve-text">Reve</text>
+  
+  <!-- Orip text -->
+  <text x="180" y="70" class="oripa-text">オリパ</text>
+  
+  <!-- Decorative line -->
+  <line x1="160" y1="40" x2="160" y2="80" stroke="#666" stroke-width="2"/>
+</svg> 
