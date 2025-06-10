@@ -421,7 +421,7 @@ class UserController extends Controller
             ->select('product_logs.*', 'products.rank')->where('product_logs.gacha_record_id', $token)->where('product_logs.user_id', $user->id)->orderBy('status', 'desc')->orderBy('product_logs.point', 'DESC')->get();
         $show_review = false;
         foreach($products as $product) {
-            if ($product->rank > 0 && $product->rank <=3) $show_review = true;
+            if ($product->rank > 0 && $product->rank <= 2) $show_review = true;
         }
         $products = ProductListResource::collection($products);
         $hide_cat_bar = 1;
@@ -430,7 +430,7 @@ class UserController extends Controller
         $gacha_record = Gacha_record::find($token);
         if ($gacha_record->status == 2) {
             $rank = Rank::where('rank', $user->current_rank)->first();
-            $rank->image = getRankImageUrl($rank->image);
+            $rank->badge = getRankImageUrl($rank->badge);
             $gacha_record->update(['status' => 1]);
             return inertia('User/Result', compact('products', 'hide_cat_bar', 'hide_back_btn', 'show_result_bg', 'token', 'show_review', 'rank'));
         }
@@ -882,6 +882,10 @@ class UserController extends Controller
         }
     }
 
+    private function getRate($l, $L, $x) {
+        return (1/2*$x*($x-$L)/$l/($l-$L) + $x*($x-$l)/$L/($L-$l)) * 100;
+    }
+
     public function profile() {
         $ranks = Rank::select('rank', 'pt_rate', 'bonus', 'dp_rate', 'image', 'badge', 'title')->orderby('rank', 'desc')->get();
         $user = auth()->user();
@@ -893,15 +897,14 @@ class UserController extends Controller
         $hide_cat_bar = 1;
         $current_rank = Rank::where('rank', $user->current_rank)->first();
         $next_rank = Rank::where('rank', '>', $user->current_rank)->orderby('rank')->first();
-        $limit = $current_rank->limit / 2;
+        $limit = $current_rank->limit * 3 / 10;
         if (!$next_rank || $next_rank->limit < 0) {
             $next_rank = $current_rank;
             $next_rank->limit *= 2;
         }
         $succeed = $user->consume_point >= $limit;
-        $target = $next_rank->limit * $next_rank->limit / (2 * $next_rank->limit - $user->consume_point);
-        $mark_pos = $limit / ($next_rank->limit * $next_rank->limit / (2 * $next_rank->limit - $limit)) * 100;
-        $current_pos = $user->consume_point / $target * 100;
+        $mark_pos = 50;
+        $current_pos = $this->getRate($limit, $next_rank->limit, $user->consume_point);
         return inertia('User/Profile', compact('hide_cat_bar', 'ranks', 'mark_pos', 'current_pos', 'succeed'));
     }
 }
