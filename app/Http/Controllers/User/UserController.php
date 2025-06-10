@@ -473,7 +473,6 @@ class UserController extends Controller
     public function gacha_end(Request $request) {
         $token = $request->token;
         $point = 0; $number_products = 0;
-        $offer_coupon_code = 'EVE-X3p0L';
         if ($token) {
             $user = auth()->user();
             $products = Product_log::where('gacha_record_id', $token)->where('status', 2)
@@ -492,7 +491,7 @@ class UserController extends Controller
                 $gacha = $gachas[0]->getDetail();
                 $hide_cat_bar = 1;
                 $hide_back_btn = 1;
-                return inertia('User/GachaEnd', compact('point', 'number_products', 'gacha', 'hide_cat_bar', 'hide_back_btn', 'offer_coupon_code'));
+                return inertia('User/GachaEnd', compact('point', 'number_products', 'gacha', 'hide_cat_bar', 'hide_back_btn'));
             } else {
                 return redirect()->route('main');
             }
