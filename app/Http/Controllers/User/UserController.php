@@ -883,6 +883,7 @@ class UserController extends Controller
     }
 
     private function getRate($l, $L, $x) {
+        if ($l == 0) return $x*(2*$L-$x)/$L/$L*100;
         return (1/2*$x*($x-$L)/$l/($l-$L) + $x*($x-$l)/$L/($L-$l)) * 100;
     }
 
@@ -903,8 +904,9 @@ class UserController extends Controller
             $next_rank->limit *= 2;
         }
         $succeed = $user->consume_point >= $limit;
-        $mark_pos = 50;
+        $mark_pos = $limit == 0 ? 0 : 50;
         $current_pos = $this->getRate($limit, $next_rank->limit, $user->consume_point);
+        var_dump($current_pos);
         return inertia('User/Profile', compact('hide_cat_bar', 'ranks', 'mark_pos', 'current_pos', 'succeed'));
     }
 }
