@@ -39,8 +39,8 @@ class DeliveryController extends Controller
             'product_logs.rare as rare',
             'product_logs.user_id as user_id',
             'product_logs.gacha_title as gacha_title',
-            'profiles.address as address',
             DB::raw('concat(profiles.first_name, profiles.last_name) as user_name'),
+            DB::raw('concat(profiles.prefecture, profiles.city, IFNULL(profiles.street,""), IF(profiles.building IS NULL, "", CONCAT("　", profiles.building))) as address'),
             'users.email as email'
         )->leftJoin('profiles', function($join) { $join->on('product_logs.user_id', '=', 'profiles.user_id'); })
         ->leftJoin('users', function($join) { $join->on('product_logs.user_id', '=', 'users.id'); })
@@ -99,8 +99,8 @@ class DeliveryController extends Controller
             'product_logs.rare as rare',
             'product_logs.user_id as user_id',
             'product_logs.gacha_title as gacha_title',
-            'profiles.address as address',
             DB::raw('concat(profiles.first_name, profiles.last_name) as user_name'),
+            DB::raw('concat(profiles.prefecture, profiles.city, IFNULL(profiles.street,""), IF(profiles.building IS NULL, "", CONCAT("　", profiles.building))) as address'),
             'users.email as email'
         )->leftJoin('profiles', function($join) { $join->on('product_logs.user_id', '=', 'profiles.user_id'); })
         ->leftJoin('users', function($join) { $join->on('product_logs.user_id', '=', 'users.id'); })
@@ -215,7 +215,7 @@ class DeliveryController extends Controller
             'product_logs.user_id as user_id',
             'product_logs.gacha_title as gacha_title',
             'product_logs.tracking_number as tracking_number',
-            'profiles.address as address',
+            DB::raw('concat(profiles.prefecture, profiles.city, IFNULL(profiles.street,""), IF(profiles.building IS NULL, "", CONCAT("　", profiles.building))) as address'),
         )->leftJoin('profiles', function($join) { $join->on('product_logs.user_id', '=', 'profiles.user_id'); })
         ->leftJoin('users', function($join) { $join->on('product_logs.user_id', '=', 'users.id'); })
         ->where('product_logs.status', 4);
@@ -351,8 +351,8 @@ class DeliveryController extends Controller
                     $item->phone,
                     '',
                     $item->postal_code,
-                    $item->prefecture.$item->address,
-                    '',
+                    $item->prefecture.$item->city.$item->street,
+                    $item->building,
                     '',
                     '',
                     $item->first_name . ' '. $item->last_name,

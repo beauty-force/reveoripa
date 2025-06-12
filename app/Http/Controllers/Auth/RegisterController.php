@@ -97,14 +97,14 @@ class RegisterController extends Controller
         }
 
         $code = generateCode(4);
-        $code = "1111";
+        // $code = "1111";
         
-        // $res = sendEmail($code, $email);
+        $res = sendEmail($code, $email);
         
-        // if (!$res) {
-        //     $data = array("status"=> 0);
-        //     return redirect()->back()->with('message', 'もう一度メールアドレスを入力してください！')->with('title', '入力エラー')->with('type', 'dialog')->with('data', $data);
-        // }
+        if (!$res) {
+            $data = array("status"=> 0);
+            return redirect()->back()->with('message', 'もう一度メールアドレスを入力してください！')->with('title', '入力エラー')->with('type', 'dialog')->with('data', $data);
+        }
 
         Verify::where('to', $email)->update(array('status'=>1));
         $data = array("to"=>$email, 'code'=>$code);
@@ -131,6 +131,8 @@ class RegisterController extends Controller
     public function register(Request $request) { 
         $request->validate([
             'password' => 'required|min:6|max:20',
+            'password_confirmation' => 'required|same:password',
+            'phone' => 'required|string',
         ]);
 
         $phone = $request->phone;
@@ -159,14 +161,14 @@ class RegisterController extends Controller
             }
         }
 
-        // $email_verified_at = Verify::where('to', $email)->where('status', 2)->first()?->updated_at;
+        $email_verified_at = Verify::where('to', $email)->where('status', 2)->first()?->updated_at;
         $user = User::create([
             'name' => "はじめてのコレクター",
             'email' => $email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'point' => 10,
-            // 'email_verified_at' => $email_verified_at
+            'point' => 0,
+            'email_verified_at' => $email_verified_at
         ]);
         if ($friend) {
             $invitation = Invitation::create([

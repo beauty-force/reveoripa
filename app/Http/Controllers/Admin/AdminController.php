@@ -228,7 +228,9 @@ class AdminController extends Controller
             'profiles.last_name_gana',
             'profiles.postal_code',
             'profiles.prefecture',
-            'profiles.address',
+            'profiles.city',
+            'profiles.street',
+            'profiles.building',
             'ranks.title as rank_title',
             'purchases.purchase_amount'
         )
@@ -269,7 +271,7 @@ class AdminController extends Controller
             foreach ($users as $user) {
                 $full_name = $user->first_name . ' ' . $user->last_name;
                 $full_name_gana = $user->first_name_gana . ' ' . $user->last_name_gana;
-                $full_address = '〒' . $user->postal_code . ' ' . $user->prefecture . ' ' . $user->address;
+                $full_address = '〒' . $user->postal_code . ' ' . $user->prefecture . ' ' . $user->city . ' ' . $user->street . ' ' . $user->building;
                 
                 $status = match($user->status) {
                     0 => '停止中',

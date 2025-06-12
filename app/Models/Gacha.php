@@ -247,6 +247,7 @@ class Gacha extends Model
             'plan_limit'=>$this->plan_limit,
             'consume_point'=>$this->consume_point,
             'gacha_limit'=>$this->gacha_limit,
+            'title'=>$this->title,
         ];
     }
 

@@ -191,10 +191,14 @@ return [
         'postal_code'=>'「郵便番号」',
         'prefecture'=>'「都道府県」',
         'address'=>'「住所」',
+        'city'=>'「市区郡町村」',
+        'street'=>'「町・番地」',
+        'building'=>'「マンション名ビル名」',
         'phone' =>'「電話番号」',
 
         'expiration' => '「有効期間」',
         'user_limit' => '「一人当上限」',
+        'invite_code' => '「招待コード」',
     ],
 
 ];

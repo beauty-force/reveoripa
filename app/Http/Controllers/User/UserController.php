@@ -418,7 +418,10 @@ class UserController extends Controller
     public function result($token) {
         $user = auth()->user();
         $products = Product_log::leftJoin('products', 'products.id', '=', 'product_logs.product_id')
-            ->select('product_logs.*', 'products.rank')->where('product_logs.gacha_record_id', $token)->where('product_logs.user_id', $user->id)->orderBy('status', 'desc')->orderBy('product_logs.point', 'DESC')->get();
+            ->select('product_logs.*', 'products.rank')
+            ->where('product_logs.gacha_record_id', $token)
+            ->where('product_logs.user_id', $user->id)
+            ->orderBy('status', 'desc')->orderBy('product_logs.point', 'DESC')->get();
         $show_review = false;
         foreach($products as $product) {
             if ($product->rank > 0 && $product->rank <= 2) $show_review = true;
@@ -434,7 +437,11 @@ class UserController extends Controller
             $gacha_record->update(['status' => 1]);
             return inertia('User/Result', compact('products', 'hide_cat_bar', 'hide_back_btn', 'show_result_bg', 'token', 'show_review', 'rank'));
         }
-        return inertia('User/Result', compact('products', 'hide_cat_bar', 'hide_back_btn', 'show_result_bg', 'token', 'show_review'));
+        $gacha_id = $gacha_record->gacha_id;
+        $delivery_limit = getOption('delivery_limit');
+        $delivery_limit = intval($delivery_limit == "" ? "1000" : $delivery_limit);
+
+        return inertia('User/Result', compact('products', 'hide_cat_bar', 'hide_back_btn', 'show_result_bg', 'token', 'show_review', 'gacha_id', 'delivery_limit'));
     }
 
     public function result_exchange(Request $request) {
@@ -583,8 +590,8 @@ class UserController extends Controller
     public function address() {
         $hide_cat_bar = 1;
         $user = auth()->user();
-        $profiles = Profile::where('user_id', $user->id)->get();
-        return inertia('User/Address', compact('hide_cat_bar', 'profiles'));
+        $profile = Profile::where('user_id', $user->id)->first();
+        return inertia('User/Address', compact('hide_cat_bar', 'profile'));
     }
 
     public function address_post(Request $request) {
@@ -595,15 +602,16 @@ class UserController extends Controller
             'last_name_gana'=>'required',
             'postal_code'=>'required',
             'prefecture'=>'required',
-            'address'=>'required',
+            'city'=>'required',
+            'street'=>'required',
             'phone' => 'required|numeric|digits:11',
         ]);
         
         $user = auth()->user();
 
-        $profiles = Profile::where('user_id', $user->id)->get();
-        if (count($profiles)>0) {
-            $profiles[0]->update($validated);
+        $profile = Profile::where('user_id', $user->id)->first();
+        if ($profile) {
+            $profile->update($validated);
         } else {
             $validated['user_id'] = $user->id;
             Profile::create($validated);

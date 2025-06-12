@@ -30,6 +30,7 @@ class DeliveryProductResource extends JsonResource
             'user_id'=>$this->user_id,
             'gacha_title'=>$this->gacha_title,
             'rank'=>$this->rank,
+            'address'=>$this->address,
             'badge'=>$this->rare == 'PSA' ? '/images/psa10.png' : ($this->rare == 'BOX' || $this->rare == 'パック' ? '/images/unopened.png' : null),
         ];
     }

@@ -16,7 +16,9 @@ class Profile extends Model
         'last_name_gana',
         'postal_code',
         'prefecture',
-        'address',
+        'city',
+        'street',
+        'building',
         'phone',
         'status',
     ];
