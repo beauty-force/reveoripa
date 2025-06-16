@@ -431,16 +431,17 @@ class UserController extends Controller
         $hide_back_btn = 1;
         $show_result_bg = 1;
         $gacha_record = Gacha_record::find($token);
-        if ($gacha_record->status == 2) {
-            $rank = Rank::where('rank', $user->current_rank)->first();
-            $rank->badge = getRankImageUrl($rank->badge);
-            $gacha_record->update(['status' => 1]);
-            return inertia('User/Result', compact('products', 'hide_cat_bar', 'hide_back_btn', 'show_result_bg', 'token', 'show_review', 'rank'));
-        }
         $gacha_id = $gacha_record->gacha_id;
         $delivery_limit = getOption('delivery_limit');
         $delivery_limit = intval($delivery_limit == "" ? "1000" : $delivery_limit);
 
+        if ($gacha_record->status == 2) {
+            $rank = Rank::where('rank', $user->current_rank)->first();
+            $rank->badge = getRankImageUrl($rank->badge);
+            $gacha_record->update(['status' => 1]);
+            return inertia('User/Result', compact('products', 'hide_cat_bar', 'hide_back_btn', 'show_result_bg', 'token', 'show_review', 'rank', 'gacha_id', 'delivery_limit'));
+        }
+        
         return inertia('User/Result', compact('products', 'hide_cat_bar', 'hide_back_btn', 'show_result_bg', 'token', 'show_review', 'gacha_id', 'delivery_limit'));
     }
 
