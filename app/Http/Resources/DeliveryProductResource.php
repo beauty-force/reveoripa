@@ -22,7 +22,7 @@ class DeliveryProductResource extends JsonResource
             'rare'=>$this->rare,
             'image'=>getProductImageUrl($this->image),
             'status'=>$this->status,
-            'updated_at'=>$this->updated_at->diffForHumans(),
+            'updated_at'=>$this->updated_at,
             'updated_at_time'=>$this->updated_at->format('Y-m-d H:i'),
             'tracking_number'=>$this->tracking_number,
             'user_name'=>$this->user_name,
@@ -31,7 +31,7 @@ class DeliveryProductResource extends JsonResource
             'gacha_title'=>$this->gacha_title,
             'rank'=>$this->rank,
             'address'=>$this->address,
-            'badge'=>$this->rare == 'PSA' ? '/images/psa10.png' : ($this->rare == 'BOX' || $this->rare == 'パック' ? '/images/unopened.png' : null),
+            // 'badge'=>$this->rare == 'PSA' ? '/images/psa10.png' : ($this->rare == 'BOX' || $this->rare == 'パック' ? '/images/unopened.png' : null),
         ];
     }
 }

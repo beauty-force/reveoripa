@@ -36,8 +36,9 @@ class ProductListResource extends JsonResource
             'status'=>$this->status,
             'is_lost_product'=>$this->is_lost_product,
             'rank'=>$this->rank,
-            'badge'=>$this->rare == 'PSA' ? '/images/psa10.png' : ($this->rare == 'BOX' || $this->rare == 'パック' ? '/images/unopened.png' : null),
+            // 'badge'=>$this->rare == 'PSA' ? '/images/psa10.png' : ($this->rare == 'BOX' || $this->rare == 'パック' ? '/images/unopened.png' : null),
             'expiration'=>$this->created_at->addDays(7)->format('Y年n月j日 H:i'),
+            'updated_at'=>$this->updated_at,
             'gacha_title'=>$this->gacha_title,
         ];
     }

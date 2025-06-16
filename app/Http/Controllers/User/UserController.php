@@ -604,6 +604,7 @@ class UserController extends Controller
             'prefecture'=>'required',
             'city'=>'required',
             'street'=>'required',
+            'building'=>'nullable',
             'phone' => 'required|numeric|digits:11',
         ]);
         
