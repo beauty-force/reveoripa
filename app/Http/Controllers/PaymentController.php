@@ -797,7 +797,6 @@ class PaymentController extends Controller
         $fincode_signature = env('FINCODE_WEBHOOK_SIGNATURE');
         if ($request->header('fincode-signature') != $fincode_signature) {
             $data = json_encode($request->all());
-            setOption('fincode_webhook-'.now().Str::random(10), $data);
             return response()->json(['error' => 'Invalid signature'], 401);
         }
         
