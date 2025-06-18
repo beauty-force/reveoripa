@@ -611,7 +611,7 @@ class PaymentController extends Controller
                     // "tax" => "0",
                     "client_field_1" => str($user->id),
                     "client_field_2" => str($point->id),
-                    "client_field_3" => str($coupon->id)
+                    "client_field_3" => $coupon ? str($coupon->id) : '0'
                 ],
                 "konbini" => [
                     "payment_term_day" => "10",
@@ -655,7 +655,7 @@ class PaymentController extends Controller
                 "job_code" => "CAPTURE",
                 "client_field_1" => str($user->id),
                 "client_field_2" => str($point->id),
-                "client_field_3" => str($coupon->id)
+                "client_field_3" => $coupon ? str($coupon->id) : '0'
             );
             if ($pay_type == 'Googlepay') {
                 $requestParams['tds_type'] = "0";
@@ -708,7 +708,7 @@ class PaymentController extends Controller
             $customInfomation = json_encode([
                 $user->id,
                 $point->id,
-                $coupon->id,
+                $coupon ? $coupon->id : 0,
             ]);
 
             $payload = [
