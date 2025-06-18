@@ -897,12 +897,13 @@ class UserController extends Controller
     }
 
     public function profile() {
-        $ranks = Rank::select('rank', 'pt_rate', 'bonus', 'dp_rate', 'image', 'badge', 'title')->orderby('rank', 'desc')->get();
+        $ranks = Rank::select('rank', 'pt_rate', 'bonus', 'dp_rate', 'image', 'badge', 'title', 'limit')->orderby('rank', 'desc')->get();
         $user = auth()->user();
         if (!$user) return redirect()->route('main');
         foreach ($ranks as $rank) {
             $rank->image = getRankImageUrl($rank->image);
             $rank->badge = getRankImageUrl($rank->badge);
+            $rank->limit = $rank->limit >= 0 ? 0 : -1;
         }
         $hide_cat_bar = 1;
         $current_rank = Rank::where('rank', $user->current_rank)->first();
