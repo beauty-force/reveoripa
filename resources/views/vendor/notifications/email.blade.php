@@ -39,16 +39,6 @@
 
 @endforeach
 
-{{-- Social Media Links --}}
-<div style="text-align: center; margin: 20px 0;">
-    <a href="https://liff.line.me/2006919906-RVxZmy1Y/landing?follow=%40775loedl&lp=6KyRyz&liff_id=2006919906-RVxZmy1Y" style="display: inline-block; margin: 0 10px; text-decoration: none;">
-        <img src="https://reve-oripa.jp/images/line.png" alt="LINE" style="width: 50px; height: 50px; border: none;">
-    </a>
-    <a href="https://x.com/Cardshop_eve" style="display: inline-block; margin: 0 10px; text-decoration: none;">
-        <img src="https://reve-oripa.jp/images/twitter.jpg" alt="X" style="width: 50px; height: 50px; border: none;">
-    </a>
-</div>
-
 {{-- Salutation --}}
 @if (! empty($salutation))
 {{ $salutation }}

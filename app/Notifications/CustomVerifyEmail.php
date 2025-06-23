@@ -62,9 +62,6 @@ class CustomVerifyEmail extends Notification
             ->line(Lang::get('auth.verify_email.line1'))
             ->line(Lang::get('auth.verify_email.line2'))
             ->action(Lang::get('auth.verify_email.action'), $this->verificationUrl($notifiable))
-            ->line(Lang::get('auth.verify_email.line3'))
-            ->line(Lang::get('auth.verify_email.line4'))
-            ->line(Lang::get('auth.verify_email.line5'))
             ->salutation(Lang::get('auth.verify_email.salutation', ['app_name' => config('app.name')]));
     }
 
