@@ -799,7 +799,8 @@ class PaymentController extends Controller
             $data = json_encode($request->all());
             return response()->json(['error' => 'Invalid signature'], 401);
         }
-        
+        $data = json_encode($request->all());
+        Log::info('Fincode Webhook', $data);
 
         if ($request->subscription_id) {
             $user = User::where('customer_id', $request->customer_id)->first();
