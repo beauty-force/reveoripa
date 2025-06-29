@@ -291,14 +291,14 @@ class UserController extends Controller
             
             if ($gacha->spin_limit == 0) $remainingSpin = $count_rest;
             else {
-                $current = date('Y-m-d H:i:s');
-                $current_day = date('Y-m-d 18:00:00');
+                // $current = date('Y-m-d H:i:s');
+                // $current_day = date('Y-m-d 18:00:00');
                 
-                if ($current < $current_day) $current_day = date('Y-m-d 18:00:00', strtotime($current_day.' -1 days'));
+                // if ($current < $current_day) $current_day = date('Y-m-d 18:00:00', strtotime($current_day.' -1 days'));
         
                 $totalSpin = Gacha_record::where('user_id', $user->id)
                     ->where('gacha_id', $id)
-                    ->where('created_at', '>=', $current_day)
+                    // ->where('created_at', '>=', $current_day)
                     ->where('status', '!=', 0)
                     ->sum('type');
                 $remainingSpin = $gacha->spin_limit - $totalSpin;
