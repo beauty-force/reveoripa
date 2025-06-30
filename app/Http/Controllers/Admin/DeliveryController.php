@@ -182,15 +182,15 @@ class DeliveryController extends Controller
 //             $email = User::find($user_id)->email;
 
 //             $content = "<center><img src='https://reve-oripa.jp/images/logo.png' style='width:100%; max-width:300px;'></center>
-// <p>この度は「イブガチャ」をご利用いただき、誠にありがとうございます。<br/>
+// <p>この度は「レヴオリパ」をご利用いただき、誠にありがとうございます。<br/>
 // お客様より発送依頼をいただきました商品を、本日発送いたしました。<br/><br/>
 // 追跡番号: {$request->tracking_number}<br/>
 // </p>";
 //             Mail::send([], [], function ($message) use ($email, $content)
 //             {
 //                 $message->to($email)
-//                     ->subject('イブガチャ 発送完了のお知らせ')
-//                     ->from(env('MAIL_FROM_ADDRESS'), 'イブガチャ')
+//                     ->subject('レヴオリパ 発送完了のお知らせ')
+//                     ->from(env('MAIL_FROM_ADDRESS'), 'レヴオリパ')
 //                     ->html($content);
 //             });
 //         }
@@ -364,7 +364,7 @@ class DeliveryController extends Controller
                     '2600014',
                     '千葉県千葉市中央区本千葉町６番１号',
                     'エレル千葉中央駅前ビル４０１号室',
-                    'イブガチャ',
+                    'レヴオリパ',
                     '',
                     '',
                     '玩具',

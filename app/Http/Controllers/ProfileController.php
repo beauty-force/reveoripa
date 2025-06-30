@@ -43,15 +43,15 @@ class ProfileController extends Controller
             'invite_bonus' => getOption('invite_bonus'),
             'invited_bonus' => getOption('invited_bonus'),
             // 'line_link_url' => 'https://line.me/R/ti/p/@775loedl',
-            'line_invite_text' => "【🎉イブガチャに招待されました！🎉】
+            'line_invite_text' => "【🎉レヴオリパに招待されました！🎉】
 
-友達からイブガチャへの特別な招待が届いています！新規登録時に以下の招待コードを入力すると、紹介した友達とあなた、2人ともにボーナスポイントが付与されます！🌟
+友達からレヴオリパへの特別な招待が届いています！新規登録時に以下の招待コードを入力すると、紹介した友達とあなた、2人ともにボーナスポイントが付与されます！🌟
 
 🔑 招待コード: 【$user->invite_code"."】 
 🔗 登録はこちらから: https://reve-oripa.jp/register?invitation_code=$user->invite_code
 
-この機会にイブガチャで楽しい時間を過ごしましょう！🎁",
-            'twitter_invite_text' => "【業界No.1 水準 イブガチャ✨】
+この機会にレヴオリパで楽しい時間を過ごしましょう！🎁",
+            'twitter_invite_text' => "【業界No.1 水準 レヴオリパ✨】
 
 友達紹介キャンペーン中⚡️
 新規登録時に以下の招待コードを入力すると、紹介した友達とあなた、2人ともにボーナスポイントが付与されます！🌟
