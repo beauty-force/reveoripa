@@ -89,7 +89,7 @@ class RegisterController extends Controller
         $email = trim($email);
         
         $request->validate([
-            'email' => 'required|string|email|max:255|unique:users'
+            'email' => 'required|string|email:rfc,dns|max:255|unique:users'
         ]);
         $count = User::where('email', $email)->count();
         if ($count>0) {
