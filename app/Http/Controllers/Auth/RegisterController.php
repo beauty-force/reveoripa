@@ -201,7 +201,7 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        $user->sendEmailVerificationNotification();
+        // $user->sendEmailVerificationNotification();
         
         return redirect()->route('register.complete');
     }
