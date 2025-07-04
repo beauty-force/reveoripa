@@ -192,7 +192,7 @@ return [
         'prefecture'=>'「都道府県」',
         'address'=>'「住所」',
         'city'=>'「市区郡町村」',
-        'street'=>'「町・番地」',
+        'street'=>'「番地以降」',
         'building'=>'「マンション・ビル名」',
         'phone' =>'「電話番号」',
 
