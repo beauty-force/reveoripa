@@ -42,7 +42,7 @@ class MyNewPasswordController extends Controller
     {
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email:rfc,dns',
             'password' => 'required|confirmed|min:6|max:128',
         ]);
 
