@@ -33,12 +33,12 @@ class RegisterController extends Controller
                 return redirect()->route('user');
             }
         }
-        $invitation_code = $request->invitation_code;
-        $invited_bonus = getOption('invited_bonus');
-        if ($invited_bonus == '') $invited_bonus = 0;
-        else $invited_bonus = intval($invited_bonus);
+        // $invitation_code = $request->invitation_code;
+        // $invited_bonus = getOption('invited_bonus');
+        // if ($invited_bonus == '') $invited_bonus = 0;
+        // else $invited_bonus = intval($invited_bonus);
         $hide_cat_bar = 1;
-        return inertia('Auth/RegisterEmail', compact('hide_cat_bar', 'invitation_code', 'invited_bonus'));
+        return inertia('Auth/RegisterEmail', compact('hide_cat_bar'));
     }
 
     public function send(Request $request) {
@@ -153,13 +153,13 @@ class RegisterController extends Controller
         }
 
         $friend = null;
-        if (isset($request->invite_code)) {
-            $invite_code = trim($request->invite_code);
-            $friend = User::where('invite_code', $invite_code)->first();
-            if ($friend == null) {
-                return redirect()->back()->with('message', '有効な招待コードを入力してください。')->with('title', 'エラー')->with('type', 'dialog');
-            }
-        }
+        // if (isset($request->invite_code)) {
+        //     $invite_code = trim($request->invite_code);
+        //     $friend = User::where('invite_code', $invite_code)->first();
+        //     if ($friend == null) {
+        //         return redirect()->back()->with('message', '有効な招待コードを入力してください。')->with('title', 'エラー')->with('type', 'dialog');
+        //     }
+        // }
 
         $email_verified_at = Verify::where('to', $email)->where('status', 2)->first()?->updated_at;
         $user = User::create([
