@@ -174,8 +174,8 @@ class PaymentController extends Controller
 
         $rank = Rank::where('rank', $user->current_rank)->first();
         
-        if ($user->id <= 2) $supported_pay_type = ['Card', 'Konbini', 'Virtualaccount'];
-        else $supported_pay_type = ['Card', 'Konbini', 'Virtualaccount'];
+        if ($user->id <= 2) $supported_pay_type = ['Card', 'Virtualaccount'];
+        else $supported_pay_type = ['Card', 'Virtualaccount'];
         return inertia('User/Point/Purchase', compact('point', 'is_admin', 'amount', 'hide_cat_bar', 'supported_pay_type', 'rank', 'code', 'no_applepay_setting', 'no_applepay_support'));
 
     }
