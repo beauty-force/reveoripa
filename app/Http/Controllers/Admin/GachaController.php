@@ -288,7 +288,7 @@ class GachaController extends Controller
         $rules = [
             'last_name' => 'required',
             'last_point' => 'required|numeric',
-            // 'last_rare' => 'required',
+            'last_rare' => 'required',
             'last_image' => 'required|image|max:4096',
             'gacha_id' => 'required',
         ];

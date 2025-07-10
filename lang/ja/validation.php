@@ -180,7 +180,7 @@ return [
 
         'last_point' => '「ポイント」',
         'last_name' => '「名前」',
-        'last_rare' => '「レア度」',
+        'last_rare' => '「種類」',
         'last_image' => '「画像」',
         'lost_product_type' => '「種類指定」',
 
