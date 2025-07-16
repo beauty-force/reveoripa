@@ -19,13 +19,6 @@ use Carbon\Carbon;
 
 class HomeController extends Controller
 {
-    public function get_period_day($current) {
-        $current_day = date('Y-m-d 20:00:00', strtotime($current));
-        if ($current < $current_day) $current = date('Y-m-d', strtotime($current.' -1 days'));
-        else $current = date('Y-m-d', strtotime($current));
-        return $current;
-    }
-
     public function index(Request $request) {
         $cat_id = $request->cat_id ? $request->cat_id : getCategories()[0]->id;
         $user = auth()->user();
@@ -46,27 +39,6 @@ class HomeController extends Controller
         $gachas = $gachas->orderBy('order_level', 'DESC')->orderBy('id', 'DESC')->get();
             // ->orderBy('order_level', 'DESC')->orderBy('id', 'DESC')->get();
         
-        if ($user && $user->type == 0) {
-            $gachas_ = [];
-            $pulled = [];
-            foreach($gachas as $gacha) {
-                $gacha->status = 0;
-                if ($gacha->gacha_limit == 1) {
-                    $last = Gacha_record::where('user_id', $user->id)->where('gacha_id', $gacha->id)->where('status', '!=', 0)->latest()->first();
-                    if ($last) {
-                        $gacha->status = 1;
-                        $now = $this->get_period_day(date('Y-m-d H:i:s'));
-                        $record = $this->get_period_day($last->updated_at);
-                        if ($now == $record) {
-                            array_push($pulled, $gacha);
-                            continue;
-                        }
-                    }
-                }
-                array_push($gachas_, $gacha);
-            }
-            $gachas = array_merge($gachas_, $pulled);
-        }
         $gachas = GachaListResource::collection($gachas);
         $hide_back_btn = 1;
         $branch_is_gacha = 1;
