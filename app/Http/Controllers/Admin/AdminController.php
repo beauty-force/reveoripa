@@ -154,7 +154,7 @@ class AdminController extends Controller
         $page_size = 30;
         $keyword = $request->keyword ? $request->keyword : "";
         $page = $request->page ? intval($request->page) : 1;
-        $order_by = $request->order_by ? $request->order_by : "amount";
+        $order_by = $request->order_by ? $request->order_by : "created_at";
 
         $search_cond = [
             'page' => $page,
@@ -162,7 +162,7 @@ class AdminController extends Controller
             'order_by' => $order_by,
         ];
 
-        $direction = $order_by == 'status' ? 'asc' : 'desc';
+        $direction = $order_by == 'status' || $order_by == 'created_at' ? 'asc' : 'desc';
         
         // if ($order_by == 'amount') {
             $purchases = DB::table('payments')
