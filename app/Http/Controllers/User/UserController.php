@@ -892,8 +892,14 @@ class UserController extends Controller
     }
 
     private function getRate($l, $L, $x) {
+        if ($x <= 0) return 0;
+        if ($x >= $L) return 1;
+
         if ($l == 0) return $x*(2*$L-$x)/$L/$L*100;
-        return (1/2*$x*($x-$L)/$l/($l-$L) + $x*($x-$l)/$L/($L-$l)) * 100;
+        $base = $x / $L;
+        $exponent = log(0.5) / log($l / $L);
+
+        return pow($base, $exponent);
     }
 
     public function profile() {
