@@ -899,7 +899,7 @@ class UserController extends Controller
         $base = $x / $L;
         $exponent = log(0.5) / log($l / $L);
 
-        return pow($base, $exponent);
+        return pow($base, $exponent) * 100;
     }
 
     public function profile() {
