@@ -313,7 +313,7 @@ class UserController extends Controller
             $status = $gacha->gacha_limit;
             
             if ($status == 1) {
-                if ($number > 1) {
+                if ($number > 10) {
                     $message = '1日1回以上ガチャできません。';
                     return redirect()->back()->with('message', $message)->with('title', '1日1回ガチャ制限')->with('type', 'dialog');
                 }
