@@ -121,7 +121,7 @@ class PaymentController extends Controller
                 return -2;
             }
             $records = Coupon_record::where(['coupon_id' => $coupon->id])->count();
-            if ($records == $coupon->count) {
+            if ($records >= $coupon->count) {
                 return -1;
             }
             $discount_rate = $coupon?->discount_rate->toArray();

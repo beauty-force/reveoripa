@@ -191,7 +191,7 @@ class CouponController extends Controller
     public function delete($id)
     {
         $coupon = Coupon::where('id', $id)->delete();
-        Coupon_record::where('coupon_id', $id)->delete();
+        // Coupon_record::where('coupon_id', $id)->delete();
         return redirect()->back()->with('message', '削除しました！')->with('title', 'ポイント配布')->with('type', 'dialog');
     }
 }

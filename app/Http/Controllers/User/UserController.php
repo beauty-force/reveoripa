@@ -526,7 +526,7 @@ class UserController extends Controller
                     $text = 'すでにこのコードを制限回数分使用しました。';
                 }
                 $records = Coupon_record::where(['coupon_id' => $coupon->id])->count();
-                if ($records == $coupon->user_limit) {
+                if ($records >= $coupon->count) {
                     $text = '利用可能な人数を超えました。';
                 }
             }
