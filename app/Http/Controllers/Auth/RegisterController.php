@@ -30,7 +30,7 @@ class RegisterController extends Controller
             if (auth()->user()->getType() == 'admin') {
                 return redirect()->route('admin');
             }else{
-                return redirect()->route('user');
+                return redirect()->route('main');
             }
         }
         // $invitation_code = $request->invitation_code;
