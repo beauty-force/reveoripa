@@ -240,6 +240,7 @@ class PaymentController extends Controller
     public function card_payment_post(Request $request) {
         $code = isset($request->code) ? $request->code : '';
         $current_rate = $this->get_discount_rate($code, $request->id);
+        $coupon = Coupon::where('code', $code)->first();
         
         if ($current_rate == -3) {
             return redirect()->back()->with('message', '有効期間を超えました。')->with('title', '取得エラー')->with('type', 'dialog');
@@ -272,7 +273,7 @@ class PaymentController extends Controller
             "amount" => strval($amount),
             "client_field_1" => str($user->id),
             "client_field_2" => str($point->id),
-            "client_field_3" => str($coupon_id) 
+            "client_field_3" => str($coupon->id ?? 0) 
         );        
         if ($this->config['is3DSecure']=="1") {
             $requestParams['tds_type'] = "2";  //   3DS2.0を利用
@@ -400,6 +401,7 @@ class PaymentController extends Controller
         $payments = Payment::where('access_id', $access_id)->where('status', 0)->get();
         if (count($payments)) {
             $payment = $payments[0];
+            $user = User::find($payment->user_id);
             $order_id = $payment->order_id;
 
             $apiPath = "/v1/payments/$order_id/secure";
@@ -415,7 +417,7 @@ class PaymentController extends Controller
                 
                 if (isset($json_data->status)) {
                     if ($json_data->status == 'CAPTURED') {
-                        $redirect_uri = ($user->type==1)? 'test.purchase_success': 'purchase_success';
+                        $redirect_uri = ($user?->type==1)? 'test.purchase_success': 'purchase_success';
                         header('Location: '. route($redirect_uri)); 
                         die();
                         exit();
@@ -611,7 +613,7 @@ class PaymentController extends Controller
                     // "tax" => "0",
                     "client_field_1" => str($user->id),
                     "client_field_2" => str($point->id),
-                    "client_field_3" => $coupon ? str($coupon->id) : '0'
+                    "client_field_3" => str($coupon->id ?? 0)
                 ],
                 "konbini" => [
                     "payment_term_day" => "10",
@@ -655,7 +657,7 @@ class PaymentController extends Controller
                 "job_code" => "CAPTURE",
                 "client_field_1" => str($user->id),
                 "client_field_2" => str($point->id),
-                "client_field_3" => $coupon ? str($coupon->id) : '0'
+                "client_field_3" => str($coupon->id ?? 0)
             );
             if ($pay_type == 'Googlepay') {
                 $requestParams['tds_type'] = "0";
@@ -804,6 +806,9 @@ class PaymentController extends Controller
         if ($request->subscription_id) {
             $user = User::where('customer_id', $request->customer_id)->first();
             if ($request->status == 'ACTIVE') {
+                if (UserSubscription::where('subscription_id', $request->subscription_id)->first()) {
+                    return response()->json(['receive' => "0"]);
+                }
                 // Create subscription in database
                 $subscription = UserSubscription::create([
                     'user_id' => $user->id,
@@ -813,40 +818,6 @@ class PaymentController extends Controller
                     'start_date' => $request->client_field_3,
                     'status' => 'active'
                 ]);
-                $payment = Payment::where('point_id', 0)
-                    ->where('user_id', $user->id)
-                    ->where('pay_type', $request->subscription_id)
-                    ->first();
-
-                if ($payment) {
-                    $plan = Plan::find($request->client_field_2);
-                    $payment->update([
-                        'pay_type' => 'subscription',
-                        'point_id' => $plan->id,
-                        'status' => 1,
-                    ]);
-                    $add_point = $plan->point;
-
-                    if ($payment->amount < $plan->amount) {
-                        
-                        $last_subscription = UserSubscription::where('user_id', $user->id)
-                            ->where('subscription_id', '!=', $subscription->subscription_id)
-                            ->orderByDesc('created_at')->first();
-
-                        if ($last_subscription) {
-                            $last_plan = Plan::find($last_subscription->plan_id);
-                            $add_point = max(0, $add_point - $last_plan?->point);
-                        }
-                        else {
-                            $add_point = $payment->amount;
-                        }
-                    }
-                    
-                    if ($add_point > 0) {
-                        (new PointHistoryController)->create($user->id, $user->point, $add_point, 'subscription', $payment->id);
-                        $user->increment('point', $add_point);
-                    }
-                }
                 $user->update([
                     'current_plan' => $request->client_field_2
                 ]);
@@ -854,10 +825,17 @@ class PaymentController extends Controller
             }
             if ($request->status == 'CAPTURED') {
                 $subscription = UserSubscription::where('subscription_id', $request->subscription_id)->first();
+                if (!$subscription) {
+                    sleep(10);
+                    $subscription = UserSubscription::where('subscription_id', $request->subscription_id)->first();
+                }
                 if ($subscription) {
                     $plan = Plan::find($subscription->plan_id);
                     $user = User::find($subscription->user_id);
 
+                    if (Payment::where('order_id', $request->order_id)->first()) {
+                        return response()->json(['receive' => "0"]);
+                    }
                     $payment = Payment::create([
                         'user_id' => $user->id,
                         'amount' => $request->amount,
@@ -889,21 +867,9 @@ class PaymentController extends Controller
                         (new PointHistoryController)->create($user->id, $user->point, $add_point, 'subscription', $payment->id);
                         $user->increment('point', $add_point);
                     }
-
+                    return response()->json(['receive' => "0"]);
                 }
-                else {
-                    $payment = Payment::create([
-                        'user_id' => $user->id,
-                        'amount' => $request->amount,
-                        'order_id' => $request->order_id,
-                        'access_id' => $request->access_id,
-                        'coupon_id' => 0,
-                        'pay_type' => $request->subscription_id,
-                        'point_id' => 0,
-                        'status' => 0,
-                    ]);
-                }
-                return response()->json(['receive' => "0"]);
+                return response()->json(['receive' => "1"]);
             }
             
         }
@@ -1034,7 +1000,7 @@ class PaymentController extends Controller
     }
 
     public function fincode_cancel(Request $request) {
-        return redirect()->route('main');
+        return redirect()->route('user.point');
     }
 
     public function captureCharge($chargeId, $amount)
