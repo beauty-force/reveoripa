@@ -353,7 +353,11 @@ class UserController extends Controller
                 $lock?->release();
             
                 if ($result == 0) {
-                    return redirect()->route('user.gacha.video', ['token' => $token]);
+                    return [
+                        'status' => 1,
+                        'token' => $token
+                    ];
+                    // return redirect()->route('user.gacha.video', ['token' => $token]);
                 }
                 else {
                     return redirect()->route('user.error', ['id' => $result]);
@@ -832,6 +836,7 @@ class UserController extends Controller
         $coupons = Coupon_record::leftJoin('coupons', 'coupons.id', '=', 'coupon_records.coupon_id')
             ->select('coupon_records.id as record_id','coupons.code', 'coupons.title', 'coupons.id', 'coupons.type', 'coupons.point', 'coupons.expiration', 'coupon_records.updated_at', 'coupon_records.status')
             ->where('coupon_records.user_id', $user->id)
+            ->where('coupons.id', '!=', null)
             ->orderBy('coupon_records.updated_at', 'desc')->get();
         $types = [
             'NORMAL' => '普通',
