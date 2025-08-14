@@ -353,11 +353,7 @@ class UserController extends Controller
                 $lock?->release();
             
                 if ($result == 0) {
-                    return [
-                        'status' => 1,
-                        'token' => $token
-                    ];
-                    // return redirect()->route('user.gacha.video', ['token' => $token]);
+                    return redirect()->route('user.gacha.video', ['token' => $token]);
                 }
                 else {
                     return redirect()->route('user.error', ['id' => $result]);
