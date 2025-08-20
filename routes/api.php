@@ -31,6 +31,7 @@ Route::post('/applepay-session/validate', [PaymentController::class, 'apple_pay_
 Route::post('/amazonpay/ipn', [PaymentController::class, 'handleAmazonpayIPN']);
 
 Route::post('/webhook', [PaymentController::class, 'webhook'])->name('webhook');
+Route::post('/webhook/gmo', [PaymentController::class, 'webhook_gmo'])->name('webhook_gmo');
 Route::post('/line/webhook', [LineAccountController::class, 'friend_request'])->name('line_webhook');
 Route::post('/tds2_ret_url', [PaymentController::class, 'tds2_ret_url'])->name('tds2_ret_url');
 Route::post('/tds2_ret_url_googlepay', [PaymentController::class, 'tds2_ret_url_googlepay'])->name('tds2_ret_url_googlepay');

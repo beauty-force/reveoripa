@@ -959,6 +959,11 @@ class PaymentController extends Controller
         }
     }
 
+    public function webhook_gmo(Request $request) {
+        Log::info('GMO Webhook', $request->all());
+        return response()->json(['receive' => "0"]);
+    }
+
     public function apple_pay_validate(Request $request) {
         $ch = curl_init();
         $data = [
