@@ -114,12 +114,12 @@ class UserController extends Controller
                 $gacha_record_sum[$record->id] = $running_sum;
                 $running_sum += $record->type;
             }
-            if (count($gacha_log) > 0) {
-                $count = Product_log::where('gacha_record_id', $gacha_log[0]->gacha_record_id)
-                    ->where('id', '<', $gacha_log[0]->id)
-                    ->count();
-                $gacha_record_sum[$gacha_log[0]->gacha_record_id] += $count;
-            }
+            // if (count($gacha_log) > 0) {
+            //     $count = Product_log::where('gacha_record_id', $gacha_log[0]->gacha_record_id)
+            //         ->where('id', '<', $gacha_log[0]->id)
+            //         ->count();
+            //     $gacha_record_sum[$gacha_log[0]->gacha_record_id] += $count;
+            // }
             foreach($gacha_log as $log) {
                 $log->gacha_record_id = (++ $gacha_record_sum[$log->gacha_record_id]);
             }
