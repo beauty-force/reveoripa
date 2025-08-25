@@ -90,7 +90,7 @@ class UserController extends Controller
             $gacha_log = Product_log::leftJoin('users', function($join) { $join->on('users.id', '=', 'product_logs.user_id'); })
             ->leftJoin('gacha_records', function($join) { $join->on('gacha_records.id', '=', 'product_logs.gacha_record_id'); });
         
-            $gacha_log = $gacha_log->select('product_logs.name', 'product_logs.point', 'product_logs.image', 'product_logs.rare', 'users.email', 'product_logs.status', 'product_logs.created_at', 'product_logs.updated_at', 'gacha_records.created_at as gacha_time', 'product_logs.gacha_record_id')
+            $gacha_log = $gacha_log->select('product_logs.id', 'product_logs.name', 'product_logs.point', 'product_logs.image', 'product_logs.rare', 'users.email', 'product_logs.status', 'product_logs.created_at', 'product_logs.updated_at', 'gacha_records.created_at as gacha_time', 'product_logs.gacha_record_id')
                 ->where('gacha_records.gacha_id', $id)
                 ->where('product_logs.status', '!=', 5);
             
@@ -113,6 +113,12 @@ class UserController extends Controller
             foreach($gacha_record as $record) {
                 $gacha_record_sum[$record->id] = $running_sum;
                 $running_sum += $record->type;
+            }
+            if (count($gacha_log) > 0) {
+                $count = Product_log::where('gacha_record_id', $gacha_log[0]->gacha_record_id)
+                    ->where('id', '<', $gacha_log[0]->id)
+                    ->count();
+                $gacha_record_sum[$gacha_log[0]->gacha_record_id] += $count;
             }
             foreach($gacha_log as $log) {
                 $log->gacha_record_id = (++ $gacha_record_sum[$log->gacha_record_id]);
