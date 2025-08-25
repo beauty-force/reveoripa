@@ -960,8 +960,12 @@ class PaymentController extends Controller
     }
 
     public function webhook_gmo(Request $request) {
-        Log::info('GMO Webhook', $request->all());
-        return response()->json(['receive' => "0"]);
+        $ip_address = $request->ip();
+        Log::info('GMO Webhook IP: ' . $ip_address, $request->all());
+        if ($ip_address != '210.175.7.20') {
+            return response('', 200);
+        }
+        return response('', 200);
     }
 
     public function apple_pay_validate(Request $request) {
