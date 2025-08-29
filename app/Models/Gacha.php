@@ -29,6 +29,7 @@ class Gacha extends Model
         'shipping_only',
         'title',
         'plan_limit',
+        'buttons',
     ];
 
     public function getProductsLostSettingAttribute(){
@@ -248,6 +249,7 @@ class Gacha extends Model
             'consume_point'=>$this->consume_point,
             'gacha_limit'=>$this->gacha_limit,
             'title'=>$this->title,
+            'buttons'=>$this->buttons,
         ];
     }
 

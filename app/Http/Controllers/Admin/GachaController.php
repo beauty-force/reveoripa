@@ -177,6 +177,7 @@ class GachaController extends Controller
             'image' => 'required|image',
             'category_id' => 'required',
             'spin_limit' => 'required|numeric',
+            'gacha_limit' => 'required|numeric',
             'rank_limit' => 'required|numeric',
             'plan_limit' => 'required|numeric',
             // 'need_line' => 'required',
@@ -199,8 +200,10 @@ class GachaController extends Controller
             'lost_product_type' => $request->lost_product_type,
             'category_id' => $request->category_id,
             'spin_limit' => $request->spin_limit,
+            'gacha_limit' => $request->gacha_limit,
             'rank_limit' => $request->rank_limit,
             'plan_limit' => $request->plan_limit,
+            'buttons' => $request->buttons,
             // 'need_line' => $request->need_line,
         ];
 

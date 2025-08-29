@@ -243,6 +243,16 @@ class UserController extends Controller
         $id = $request->id;
         $number = $request->number;
         $gacha = Gacha::find($id);
+        if (!$gacha) {
+            return redirect()->route('main');
+        }
+        $buttons = $gacha->buttons;
+        if ($buttons) {
+            $buttons = explode(',', $buttons);
+            if (!in_array($number, $buttons)) {
+                return redirect()->route('main');
+            }
+        }
         // if ($gacha->rank_limit == -1) {
         //     if ($gacha->description != $request->code) {
         //         return redirect()->route('main');
@@ -316,22 +326,15 @@ class UserController extends Controller
             if ($number > $count_rest) $number = $count_rest;
             if ($number > $remainingSpin) $number = $remainingSpin;
             
-            $status = $gacha->gacha_limit;
+            $limit = $gacha->gacha_limit;
             
-            if ($status == 1) {
-                if ($number > 1) {
-                    $message = '1日1回以上ガチャできません。';
-                    return redirect()->back()->with('message', $message)->with('title', '1日1回ガチャ制限')->with('type', 'dialog');
+            $today_spin = Gacha_record::where('user_id', $user->id)->where('gacha_id', $id)->where('status', '!=', 0)->where('created_at', '>=', date('Y-m-d 00:00:00'))->sum('type');
+            if ($limit > 0) {
+                if ($limit <= $today_spin) {
+                    $message = '1日'.$limit.'回以上ガチャできません。';
+                    return redirect()->back()->with('message', $message)->with('title', '1日'.$limit.'回ガチャ制限')->with('type', 'dialog');
                 }
-                $last = Gacha_record::where('user_id', $user->id)->where('gacha_id', $id)->where('status', '!=', 0)->latest()->first();
-                if ($last) {
-                    $now = $this->get_period_day(date('Y-m-d H:i:s'));
-                    $record = $this->get_period_day($last->updated_at);
-                    if ($now == $record) {
-                        $message = '1日1回以上ガチャできません。';
-                        return redirect()->back()->with('message', $message)->with('title', '1日1回ガチャ制限')->with('type', 'dialog');
-                    }
-                }
+                $number = min($number, $limit - $today_spin);
             }
             
             $gacha_point = $gacha->point * $number;
@@ -497,12 +500,12 @@ class UserController extends Controller
                 $number_products = $number_products + 1;
             }
             $gacha_record = Gacha_record::find($token);
-            if ($gacha_record) {
-                $gachas = Gacha::where('id', $gacha_record->gacha_id)->get();
-                if (!count($gachas)) {
+            if ($gacha_record && $gacha_record->user_id == $user->id) {
+                $gacha = Gacha::find($gacha_record->gacha_id);
+                if (!$gacha) {
                     return redirect()->route('main');
                 }
-                $gacha = $gachas[0]->getDetail();
+                $gacha = $gacha->getDetail();
                 $hide_cat_bar = 1;
                 $hide_back_btn = 1;
                 return inertia('User/GachaEnd', compact('point', 'number_products', 'gacha', 'hide_cat_bar', 'hide_back_btn'));

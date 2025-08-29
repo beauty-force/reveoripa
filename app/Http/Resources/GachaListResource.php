@@ -33,6 +33,7 @@ class GachaListResource extends JsonResource
             'remaining'=>$timeStatus == 0 ? (strtotime($this->start_time) - strtotime(date('Y-m-d H:i:s'))) : 
                 ($this->end_time ? strtotime($this->end_time) - strtotime(date('Y-m-d H:i:s')) : 0),
             'gacha_limit'=>$this->gacha_limit,
+            'buttons'=>$this->buttons,
         ];
     }
 }

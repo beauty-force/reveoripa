@@ -7,6 +7,7 @@ use App\Models\User;
 use \App\Http\Controllers\PaymentController;
 use \App\Http\Controllers\LineAccountController;
 use \App\Http\Controllers\User\SubscriptionController;
+use \App\Http\Controllers\HomeController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('/home', [HomeController::class, 'home'])->name('home');
 Route::post('/fincode_success', [PaymentController::class, 'fincode_success'])->name('fincode_success');
 Route::post('/fincode_cancel', [PaymentController::class, 'fincode_cancel'])->name('fincode_cancel');
 Route::post('/purchase/card_register_callback', [PaymentController::class, 'card_register_callback'])->name('purchase.card_register_callback');
