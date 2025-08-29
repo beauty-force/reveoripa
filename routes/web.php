@@ -251,7 +251,6 @@ Route::group(['prefix'=>'admin', 'middleware' => 'user-access:staff'], function(
     Route::post('/gacha/product/create', [GachaController::class, 'product_create'])->name('admin.gacha.product.create');
 
     Route::post('/gacha/to_public', [GachaController::class, 'to_public'])->name('admin.gacha.to_public'); 
-    Route::post('/gacha/gacha_limit', [GachaController::class, 'gacha_limit'])->name('admin.gacha.gacha_limit'); 
     Route::post('/gacha/shuffle_mode', [GachaController::class, 'shuffle_mode'])->name('admin.gacha.shuffle_mode'); 
     Route::delete('/gacha/destroy/{id}', [GachaController::class, 'destroy'])->name('admin.gacha.destroy'); 
     

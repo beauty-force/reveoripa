@@ -98,3 +98,8 @@
         margin-bottom: 3px!important;
     }
 }
+
+.multiselect__input {
+    border-radius: 5px!important;
+    height: 30px!important;
+}

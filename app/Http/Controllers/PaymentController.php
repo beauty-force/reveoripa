@@ -41,6 +41,13 @@ class PaymentController extends Controller
         'sandbox'       => '',
         'algorithm' => ''
     ];
+    public $mulpay_config = [
+        'sandbox' => '',
+        'shop_id' => '',
+        'shop_pass' => '',
+        'config_id' => '',
+        'api_endpoint' => '',
+    ];
 
     protected function set_config() {
         $this->config['testOrLive'] = getOption('testOrLive');
@@ -66,6 +73,15 @@ class PaymentController extends Controller
         $this->amazonpay_config['region']        = env('AMAZON_PAY_REGION');
         $this->amazonpay_config['sandbox']       = $sandbox;
         $this->amazonpay_config['algorithm'] = 'AMZN-PAY-RSASSA-PSS-V2';
+    }
+
+    protected function set_mulpay_config() {
+        $this->mulpay_config['sandbox'] = env('MULPAY_SANDBOX', true);
+        $mode = $this->mulpay_config['sandbox'] ? 'TEST' : 'LIVE';
+        $this->mulpay_config['shop_id'] = env($mode . '_MULPAY_SHOP_ID');
+        $this->mulpay_config['shop_pass'] = env($mode . '_MULPAY_SHOP_PASS');
+        $this->mulpay_config['config_id'] = env($mode . '_MULPAY_CONFIG_ID');
+        $this->mulpay_config['api_endpoint'] = env($mode . '_MULPAY_API_ENDPOINT');
     }
 
     public function do_request($apiPath, $method, $requestParams) {
@@ -174,8 +190,8 @@ class PaymentController extends Controller
 
         $rank = Rank::where('rank', $user->current_rank)->first();
         
-        if ($user->id <= 2) $supported_pay_type = ['Card', 'Virtualaccount'];
-        else $supported_pay_type = ['Card', 'Virtualaccount'];
+        if ($user->id <= 2) $supported_pay_type = ['Card', 'Virtualaccount', 'Konbini'];
+        else $supported_pay_type = ['Card', 'Virtualaccount', 'Konbini'];
         return inertia('User/Point/Purchase', compact('point', 'is_admin', 'amount', 'hide_cat_bar', 'supported_pay_type', 'rank', 'code', 'no_applepay_setting', 'no_applepay_support'));
 
     }
@@ -591,7 +607,7 @@ class PaymentController extends Controller
 
         $profile = Profile::where('user_id', $user->id)->first();
 
-        if ($pay_type == 'Card' || $pay_type == 'Paypay' || $pay_type == 'Konbini' || $pay_type == 'Virtualaccount') {
+        if ($pay_type == 'Card' || $pay_type == 'Paypay' || $pay_type == 'Virtualaccount') {
 
             $apiPath = "/v1/sessions";
             
@@ -613,7 +629,7 @@ class PaymentController extends Controller
                     // "tax" => "0",
                     "client_field_1" => str($user->id),
                     "client_field_2" => str($point->id),
-                    "client_field_3" => str($coupon->id ?? 0)
+                    "client_field_3" => str($coupon?->id ?? 0)
                 ],
                 "konbini" => [
                     "payment_term_day" => "10",
@@ -646,6 +662,89 @@ class PaymentController extends Controller
             return [
                 'status' => 0,
                 'message' => $text
+            ];
+        }
+        else if ($pay_type == 'Konbini') {
+            $this->set_mulpay_config();
+            // リクエストコネクションの設定
+            $curl=curl_init();
+            curl_setopt( $curl, CURLOPT_POST, true );
+            curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+            curl_setopt( $curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+            // リクエスト先URL
+            curl_setopt( $curl, CURLOPT_URL, $this->mulpay_config['api_endpoint'] . '/payment/GetLinkplusUrlPayment.json');
+
+            $order_id = 'M-'.Str::random(25);
+            // JSON文字列例
+            $param = [
+                'configid'          => $this->mulpay_config['config_id'],
+                'transaction'       => [
+                    'OrderID'                 => $order_id,
+                    'Amount'                  => str($amount),
+                    'Tax'                     => '0',
+                    'Overview'                => 'Reve-Oripa',
+                    'ClientField1'            => str($user->id),
+                    'ClientField2'            => str($point->id),
+                    'ClientField3'            => str($coupon?->id ?? 0),
+                    'PayMethods'              => ['cvs'],
+                    'RetUrl'                  => route('home'),
+                ],
+                'geturlparam'       => [
+                    'ShopID'              => $this->mulpay_config['shop_id'],
+                    'ShopPass'            => $this->mulpay_config['shop_pass'],
+                    'GuideMailSendFlag'   => '0',
+                    'ThanksMailSendFlag'  => '0',
+                    'TemplateNo'          => '0'
+                ]
+            ];
+            $param_json = json_encode( $param );
+
+            // リクエストボディの生成
+            curl_setopt( $curl, CURLOPT_POSTFIELDS, $param_json );
+
+            // リクエスト送信
+            $response = curl_exec( $curl );
+            $curlinfo = curl_getinfo( $curl );
+            curl_close( $curl );
+
+            // レスポンスチェック
+            if( $curlinfo[ 'http_code' ] != 200 ){
+                // エラー
+                print_r($response);
+                return false;
+            }
+
+            if ($coupon) {
+                if ($coupon->expiration <= date('Y-m-d H:i:s')) {
+                    $coupon_id = 0;
+                }
+                $records = Coupon_record::where('coupon_id', $coupon->id)->where('user_id', $user->id)->count();
+                if ($records >= $coupon->user_limit) {
+                    $coupon_id = 0;
+                }
+                $total_records = Coupon_record::where('coupon_id', $coupon->id)->count();
+                if ($total_records >= $coupon->count) {
+                    $coupon_id = 0;
+                }
+            }
+            else {
+                $coupon_id = 0;
+            }
+            Payment::Create([
+                'user_id' => $user->id,
+                'point_id' => $point->id,
+                'access_id' => '',
+                'order_id' => $order_id,
+                'pay_type' => $pay_type,
+                'coupon_id' => $coupon_id,
+                'amount' => $amount,
+            ]);
+            
+            $response = json_decode($response);
+            return [
+                'status' => 1,
+                'link_url' => $response->LinkUrl
             ];
         }
         else if ($pay_type == 'Applepay' || $pay_type == 'Googlepay') {
@@ -930,11 +1029,11 @@ class PaymentController extends Controller
 
                     if ($point->amount != intval($request->amount)) {
                         if ($payment->coupon_id == 0) {
-                            $pt_amount = $request->amount;
+                            $pt_amount = intval($request->amount);
                             $pt_rate = 0;
                         }
                         if ($request->pay_type == 'Virtualaccount' && $request->amount != $request->billing_amount) {
-                            $pt_amount = $request->amount;
+                            $pt_amount = intval($request->amount);
                             $pt_rate = 0;
                         }
                     }
@@ -961,11 +1060,65 @@ class PaymentController extends Controller
 
     public function webhook_gmo(Request $request) {
         $ip_address = $request->ip();
-        Log::info('GMO Webhook IP: ' . $ip_address, $request->all());
-        if ($ip_address != '210.175.7.20') {
-            return response('', 200);
+        Log::info('GMO Webhook from ' . $ip_address, $request->all());
+        $server_ip = env((env('MULPAY_SANDBOX', true) ? 'TEST' : 'LIVE').'_MULPAY_WEBHOOK_IP');
+        if ($ip_address != $server_ip) {
+            return response('0', 200);
         }
-        return response('', 200);
+        $payment = Payment::where('order_id', $request->OrderID)->first();
+        if (!$payment) {
+            return response('0', 200);
+        }
+        if ($request->Status == 'REQSUCCESS') {
+            $payment->update(['access_id' => $request->AccessID]);
+        }
+        else if ($request->Status == 'PAYSUCCESS') {
+            if ($payment->status == 1) {
+                return response('0', 200);
+            }
+            $coupon_id = $payment->coupon_id;
+            $coupon = Coupon::where('id', $coupon_id)->where('type', 'DISCOUNT')->first();
+            if ($coupon) {
+                if ($coupon->expiration <= date('Y-m-d H:i:s')) {
+                    $coupon_id = 0;
+                }
+                $records = Coupon_record::where('coupon_id', $coupon->id)->where('user_id', $user->id)->count();
+                if ($records >= $coupon->user_limit) {
+                    $coupon_id = 0;
+                }
+                $total_records = Coupon_record::where('coupon_id', $coupon->id)->count();
+                if ($total_records >= $coupon->count) {
+                    $coupon_id = 0;
+                }
+            }
+            else {
+                $coupon_id = 0;
+            }
+            $rank = Rank::where('rank', $user->current_rank)->first();
+            $pt_rate = 0;
+            if ($rank) $pt_rate = $rank -> pt_rate / 100;
+
+            if ($point->amount != intval($request->Amount) && $coupon_id == 0) {
+                $pt_amount = intval($request->Amount);
+                $pt_rate = 0;
+            }
+            if ($coupon_id > 0) {
+                $coupon_id = Coupon_record::create([
+                    'coupon_id' => $coupon_id,
+                    'user_id' => $user->id,
+                ])->id;
+            }
+            
+            $payment->update(['status' => 1, 'coupon_id' => $coupon_id]);
+                
+            $add_point = $pt_amount + (int)($point->point * $pt_rate);
+            (new PointHistoryController)->create($user->id, $user->point, $add_point, 'purchase', $payment->id);
+            
+            $user->increment('point', $add_point);
+            
+            $this->add_invited_bonus($user);
+        }
+        return response('0', 200);
     }
 
     public function apple_pay_validate(Request $request) {

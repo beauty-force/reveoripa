@@ -11,6 +11,7 @@ use App\Http\Resources\ProductListResource;
 use App\Models\Gacha_record;
 use App\Models\Point_history;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Product;
 use Str;
@@ -139,5 +140,10 @@ class HomeController extends Controller
         $title = 'DP交換表';
         $content = getOption('dp_table');
         return inertia('User/Dp/Table', compact('hide_cat_bar', 'title', 'content'));
+    }
+
+    public function home(Request $request) {
+        Log::info($request->all());
+        return redirect()->route('main');
     }
 }

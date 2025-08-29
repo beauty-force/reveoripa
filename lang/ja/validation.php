@@ -199,6 +199,8 @@ return [
         'expiration' => '「有効期間」',
         'user_limit' => '「一人当上限」',
         'invite_code' => '「招待コード」',
+        'gacha_limit' => '「1日上限」',
+        'spin_limit' => '「全期間制限」',
     ],
 
 ];
