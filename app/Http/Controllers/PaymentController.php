@@ -1077,9 +1077,11 @@ class PaymentController extends Controller
                 return response('0', 200);
             }
             $user = User::find($payment->user_id);
-            if (!$user) {
+            $point = Point::find($payment->point_id);
+            if (!$user || !$point) {
                 return response('0', 200);
             }
+            $pt_amount = $point->point;
             $coupon_id = $payment->coupon_id;
             $coupon = Coupon::where('id', $coupon_id)->where('type', 'DISCOUNT')->first();
             if ($coupon) {

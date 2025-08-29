@@ -143,7 +143,6 @@ class HomeController extends Controller
     }
 
     public function home(Request $request) {
-        Log::info($request->all());
         return redirect()->route('main');
     }
 }
