@@ -1076,6 +1076,10 @@ class PaymentController extends Controller
             if ($payment->status == 1) {
                 return response('0', 200);
             }
+            $user = User::find($payment->user_id);
+            if (!$user) {
+                return response('0', 200);
+            }
             $coupon_id = $payment->coupon_id;
             $coupon = Coupon::where('id', $coupon_id)->where('type', 'DISCOUNT')->first();
             if ($coupon) {
