@@ -1081,6 +1081,7 @@ class PaymentController extends Controller
             if (!$user || !$point) {
                 return response('0', 200);
             }
+            $pt_amount = $point->point;
             $coupon_id = $payment->coupon_id;
             $coupon = Coupon::where('id', $coupon_id)->where('type', 'DISCOUNT')->first();
             if ($coupon) {
