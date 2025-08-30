@@ -31,9 +31,8 @@ class HomeController extends Controller
 
         if (!$user || $user->getType() == 'user') {
             $gachas = $gachas->where(function($query) use ($rank) {
-                $query->where('rank_limit', '<=', $rank);
-                    // ->where('rank_limit', '=', $rank)
-                    // ->orWhere('rank_limit', 0);
+                $query->where('rank_limit', '=', $rank)
+                    ->orWhere('rank_limit', 0);
             });
         }
         

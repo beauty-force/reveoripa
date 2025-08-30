@@ -271,7 +271,7 @@ class UserController extends Controller
         if (!$gacha || $gacha->lost_product_type != '1' && $gacha->count_card == $gacha->count || $gacha->status == 0) {
             return redirect()->route('main');
         }
-        if ($gacha->rank_limit > 0 && $gacha->rank_limit > $user->current_rank) {
+        if ($gacha->rank_limit > 0 && $gacha->rank_limit != $user->current_rank) {
             return redirect()->route('main');
         }
         if ($gacha->plan_limit != 0) {
