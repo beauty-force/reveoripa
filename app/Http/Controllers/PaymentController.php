@@ -737,7 +737,7 @@ class PaymentController extends Controller
                 'access_id' => '',
                 'order_id' => $order_id,
                 'pay_type' => $pay_type,
-                'coupon_id' => $coupon_id,
+                'coupon_id' => $coupon?->id ?? 0,
                 'amount' => $amount,
             ]);
             
