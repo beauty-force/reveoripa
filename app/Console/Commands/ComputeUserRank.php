@@ -33,13 +33,16 @@ class ComputeUserRank extends Command
         $today = Carbon::now()->toDateString();
         
         $users = User::where('month', '<', $today)->get();
+        $now = date('Y-m');
+
         foreach ($users as $user) {
+            if ($user->month == $now) continue;
             $rank = Rank::where('rank', $user->current_rank)->first();
             if ($user->consume_point * 10 < $rank->limit * 3 && $user->current_rank > 1) {
                 $user->current_rank --;
             }
             $user->consume_point = 0;
-            $user->month = date('Y-m');
+            $user->month = $now;
             $user->save();
         }
         return Command::SUCCESS;
