@@ -22,7 +22,7 @@ class DeliveryProductResource extends JsonResource
             'rare'=>$this->rare,
             'image'=>getProductImageUrl($this->image),
             'status'=>$this->status,
-            'updated_at'=>$this->updated_at,
+            'updated_at'=>(string)$this->updated_at,
             'updated_at_time'=>$this->updated_at->format('Y-m-d H:i'),
             'tracking_number'=>$this->tracking_number,
             'user_name'=>$this->user_name,
