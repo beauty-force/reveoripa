@@ -317,3 +317,11 @@ if ( ! function_exists('sendLineMessage')){
         return $response->json();
     }
 }
+
+if ( ! function_exists('getProductBadgeUrl')){
+    function getProductBadgeUrl($rare, $product_id)
+    {
+        if ($rare == 'PSA' && $product_id > 0) return '/images/psa10.png';
+        return null;
+    }
+}

@@ -129,7 +129,7 @@ class UserController extends Controller
             $log->image = getProductImageUrl($log->image);
         }
         $gacha = $gacha->getDetail();
-        $gacha['products'] = Product::select('image', 'rank', 'is_last', 'rare', 'lost_type',
+        $gacha['products'] = Product::select('id', 'image', 'rank', 'is_last', 'rare', 'lost_type',
             DB::raw('category_id as marks'))
             ->where('gacha_id', $id)
             ->where('category_id', '>=', 0)
@@ -141,8 +141,7 @@ class UserController extends Controller
 
         foreach($gacha['products'] as $product) {
             $product->image = getProductImageUrl($product->image);
-            if ($product->rare == 'PSA') $product->badge = '/images/psa10.png';
-            if ($product->rare == 'BOX' || $product->rare == 'パック') $product->badge = '/images/unopened.png';
+            $product->badge = getProductBadgeUrl($product->rare, $product->id);
         }
         $hide_cat_bar = 1;
 
@@ -433,9 +432,11 @@ class UserController extends Controller
             ->orderBy('status', 'desc')->orderBy('product_logs.point', 'DESC')->get();
         $show_review = false;
         foreach($products as $product) {
+            $product->image = getProductImageUrl($product->image);
+            $product->badge = getProductBadgeUrl($product->rare, $product->product_id);
             if ($product->rank > 0 && $product->rank <= 2) $show_review = true;
         }
-        $products = ProductListResource::collection($products);
+        
         $hide_cat_bar = 1;
         $hide_back_btn = 1;
         $show_result_bg = 1;
@@ -634,7 +635,7 @@ class UserController extends Controller
         $user = auth()->user();
         $this->auto_product_point_exchange($user);
         $products = Product_log::where('user_id', $user->id)->where('status', 1)->orderBy('point', 'DESC')->get();
-        $products = ProductListResource::collection($products); 
+        $products = DeliveryProductResource::collection($products); 
 
         $user = auth()->user();
         $profiles = Profile::where('user_id', $user->id)->get();
