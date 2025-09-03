@@ -31,7 +31,8 @@ class DeliveryProductResource extends JsonResource
             'gacha_title'=>$this->gacha_title,
             'rank'=>$this->rank,
             'address'=>$this->address,
-            // 'badge'=>$this->rare == 'PSA' ? '/images/psa10.png' : ($this->rare == 'BOX' || $this->rare == 'パック' ? '/images/unopened.png' : null),
+            'expiration'=>$this->created_at->addDays(7)->format('Y年n月j日 H:i'),
+            'badge'=>getProductBadgeUrl($this->rare, $this->product_id),
         ];
     }
 }

@@ -308,6 +308,7 @@ class GachaController extends Controller
             'point' => $request->last_point,
             'rare' => $request->last_rare,
             'gacha_id' => $request->gacha_id,
+            'lost_type' => $request->last_lost_type,
             'is_last' => 1,
         ];
         if($request->last_image){
