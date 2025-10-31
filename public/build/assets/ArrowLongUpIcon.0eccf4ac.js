@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:public/build/assets/ArrowLongUpIcon.0eccf4ac.js
 import{p as jt,q as ct,r as $t,o as Dt,c as St,b as Tt}from"./app.1c614a5d.js";/*!
-========
-import{p as jt,q as ct,r as $t,o as Dt,c as St,b as Tt}from"./app.f8a8e103.js";/*!
->>>>>>>> test:public/build/assets/ArrowLongUpIcon.6e8c668f.js
   * vue-draggable-next v2.1.0
   * (c) 2021 Anish George
   * @license MIT

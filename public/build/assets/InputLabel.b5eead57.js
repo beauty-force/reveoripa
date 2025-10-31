@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/InputLabel.d53b52ab.js
-import{o as e,c as t,t as o,m as l,f as n}from"./app.1c614a5d.js";const r={class:"block font-medium text-sm text-slate-700"},c={key:0},u={key:1},d={key:2,class:"text-red-500 ml-1"},_={__name:"InputLabel",props:{value:{type:String,default:""},required:{type:Boolean,default:!1}},setup(s){return(a,i)=>(e(),t("label",r,[s.value?(e(),t("span",c,o(s.value),1)):(e(),t("span",u,[l(a.$slots,"default")])),s.required?(e(),t("span",d,"*")):n("",!0)]))}};export{_};
-========
-import{o as e,c as t,t as o,m as l,f as n}from"./app.f8a8e103.js";const r={class:"block font-medium text-sm text-slate-700"},c={key:0},u={key:1},d={key:2,class:"text-red-500 ml-1"},_={__name:"InputLabel",props:{value:{type:String,default:""},required:{type:Boolean,default:!1}},setup(s){return(a,i)=>(e(),t("label",r,[s.value?(e(),t("span",c,o(s.value),1)):(e(),t("span",u,[l(a.$slots,"default")])),s.required?(e(),t("span",d,"*")):n("",!0)]))}};export{_};
->>>>>>>> test:public/build/assets/InputLabel.b5eead57.js
