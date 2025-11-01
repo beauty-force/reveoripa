@@ -283,7 +283,7 @@ class UserController extends Controller
             }
         }
         $userLock = Cache::lock('startGacha'.$user->id, 60);
-        $userLock1 = Cache::lock('gacha'.$user->id, 5);
+        $userLock1 = Cache::lock('gacha'.$user->id, 7);
         if (!$userLock->get()) {
             $record = Gacha_record::where('user_id', $user->id)->where('gacha_id', $id)->where('status', 1)->latest()->first();
             if ($record) {
