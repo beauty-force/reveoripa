@@ -150,92 +150,100 @@ class UserController extends Controller
     }
 
     public function reward($user, $gacha, $number, $token) {
-        $user = User::find($user->id);
-        $gacha = Gacha::find($gacha->id);
-        $ableCount = $gacha->ableCount();  // Check Gacha Product   #3
-        if ($ableCount==0) return 1;
+        $user = User::lockForUpdate()->find($user->id);
+        $result = 0;
+        DB::transaction(function () use ($user, $gacha, $number, $token, &$result) {
+            $gacha = Gacha::find($gacha->id);
+            $ableCount = $gacha->ableCount();  // Check Gacha Product   #3
+            if ($ableCount==0) {
+                $result = 1;
+                return;
+            }
 
-        $point = $user->point - $gacha->point * $number;  // Check User Point   #4
-        if ($point<0) return 4;
+            $point = $user->point - $gacha->point * $number;  // Check User Point   #4
+            if ($point<0) {
+                $result = 4;
+                return;
+            }
 
-        $count_rest = $gacha->count_card - $gacha->count;
-        $award_products = $gacha->getAward($number, $count_rest, $gacha->count);
-        if ($award_products) {} else {
-            return 1;  // Check Gacha Product   #3
-        }
+            $count_rest = $gacha->count_card - $gacha->count;
+            $award_products = $gacha->getAward($number, $count_rest, $gacha->count);
+            if (!$award_products) {
+                $result = 1;
+                return;
+            }
 
-        foreach($award_products as $key) {
-            $product_item = Product::find($key);
-            if ($product_item->marks>0 || $product_item->is_last == 1) {
-                $data = [
-                    'product_id' => $product_item->id,
-                    'point' => $product_item->point,
-                    'rare' => $product_item->rare,
-                    'image' => $product_item->image,
-                    'name' => $product_item->name,
-                    'gacha_record_id' => $token, 
-                    'user_id' => $user->id,
-                    'status' => 1,
-                    'rank' => $product_item->rank,
-                    'gacha_title' => $gacha->title,
-                ];
-                if ($product_item->lost_type == '1' || $product_item->lost_type == 'true') {
-                    $data['status'] = 3;
-                }
-                Product_log::create($data);
-                
-                if ($product_item->is_last == 1) continue;
-                if ($gacha->lost_product_type != '1' || $product_item->is_lost_product == 1 || $product_item->order > 0) {
-                    $product_item->decrement('marks');
-                }
+            foreach($award_products as $key) {
+                $product_item = Product::find($key);
+                if ($product_item->marks>0 || $product_item->is_last == 1) {
+                    $data = [
+                        'product_id' => $product_item->id,
+                        'point' => $product_item->point,
+                        'rare' => $product_item->rare,
+                        'image' => $product_item->image,
+                        'name' => $product_item->name,
+                        'gacha_record_id' => $token, 
+                        'user_id' => $user->id,
+                        'status' => 1,
+                        'rank' => $product_item->rank,
+                        'gacha_title' => $gacha->title,
+                    ];
+                    if ($product_item->lost_type == '1' || $product_item->lost_type == 'true') {
+                        $data['status'] = 3;
+                    }
+                    Product_log::create($data);
+                    
+                    if ($product_item->is_last == 1) continue;
+                    if ($gacha->lost_product_type != '1' || $product_item->is_lost_product == 1 || $product_item->order > 0) {
+                        $product_item->decrement('marks');
+                    }
 
-                if ($gacha->lost_product_type != '1') {
-                    if ($product_item->is_lost_product == 1) {
-                        Gacha_lost_product::where('gacha_id', $gacha->id)
-                        ->where('point', $product_item->point)
-                        ->where('count','>',0)
-                        ->first()?->decrement('count');
+                    if ($gacha->lost_product_type != '1') {
+                        if ($product_item->is_lost_product == 1) {
+                            Gacha_lost_product::where('gacha_id', $gacha->id)
+                            ->where('point', $product_item->point)
+                            ->where('count','>',0)
+                            ->first()?->decrement('count');
+                        }
                     }
                 }
+            
             }
-        
-        }
-        $gacha->update(['count'=> $gacha->count + $number ]);
-        
-        Gacha_record::find($token)->update(['status'=>1]);
-        
-        (new PointHistoryController)->create($user->id, $user->point, -$gacha->point * $number, 'gacha', $token);
+            $gacha->increment('count', $number);
+            
+            Gacha_record::find($token)->update(['status'=>1]);
+            
+            (new PointHistoryController)->create($user->id, $user->point, -$gacha->point * $number, 'gacha', $token);
 
-        $rank = Rank::where('rank', $user->current_rank)->first();
-        $dp_rate = 1;
-        if ($rank) $dp_rate = $rank->dp_rate;
+            $rank = Rank::where('rank', $user->current_rank)->first();
+            $dp_rate = 1;
+            if ($rank) $dp_rate = $rank->dp_rate;
 
-        $dp = intval($gacha->point * $number * $dp_rate / 100);
-        $point = - $gacha->point * $number;
-        $consume_point = $gacha->consume_point * $number;
+            $dp = intval($gacha->point * $number * $dp_rate / 100);
+            $point = - $gacha->point * $number;
+            $consume_point = $gacha->consume_point * $number;
 
-        $user = computeUserRank($user);
-        $user->update([
-            'dp' => $user->dp + $dp,
-            'point' => $user->point + $point,
-            'consume_point' => $user->consume_point + $consume_point
-        ]);
-        $rank = Rank::where('rank', $user->current_rank)->first();
-        $next_ranks = Rank::where('rank', '>', $rank->rank)
-            ->where('limit', '<=', $user->consume_point)
-            ->where('limit', '>', 0)
-            ->orderby('rank')->get();
-        foreach ($next_ranks as $next_rank) {
-            $user->current_rank = $next_rank->rank;
-            $rank = $next_rank;
-            (new PointHistoryController)->create($user->id, $user->point, $rank->bonus, 'rank_up', $rank->rank);
-            $user->point += $rank->bonus;
-            $user->month = date('Y-m');
-            $user->save();
-            Gacha_record::find($token)->update(['status'=>2]);
-        }
+            $user = computeUserRank($user);
+            $user->increment('dp', $dp);
+            $user->increment('point', $point);
+            $user->increment('consume_point', $consume_point);
 
-        return 0;
+            $next_ranks = Rank::where('rank', '>', $rank->rank)
+                ->where('limit', '<=', $user->consume_point)
+                ->where('limit', '>', 0)
+                ->orderby('rank')->get();
+            foreach ($next_ranks as $next_rank) {
+                $user->current_rank = $next_rank->rank;
+                $rank = $next_rank;
+                (new PointHistoryController)->create($user->id, $user->point, $rank->bonus, 'rank_up', $rank->rank);
+                $user->point += $rank->bonus;
+                $user->month = date('Y-m');
+                $user->save();
+                Gacha_record::find($token)->update(['status'=>2]);
+            }
+        });
+
+        return $result;
     }
 
     public function start(Request $request) {
@@ -467,9 +475,11 @@ class UserController extends Controller
         $user = auth()->user();
         
         DB::transaction(function () use ($user, $checks, $token) {
-            $logs = Product_log::where('gacha_record_id', $token)->where('user_id', $user->id)->where('status', 1)->get();
+            $logs = Product_log::where('gacha_record_id', $token)->where('user_id', $user->id)->where('status', 1)->lockForUpdate()->get();
+            $user = User::lockForUpdate()->find($user->id);
     
-            $point = $user->point;
+            $count = 0;
+            $sum = 0;
             foreach($logs as $log) {
                 $key = "id" . $log->id;
                 if (isset($checks[$key]) && $checks[$key]) {
@@ -479,11 +489,14 @@ class UserController extends Controller
                         if ($product->is_lost_product > 0)
                             $product->increment('marks');
                     }
-                    (new PointHistoryController)->create($user->id, $point, $log->point, 'exchange', $log->id);
-                    $point = $point + $log->point;
+                    $sum = $sum + $log->point;
+                    $count = $count + 1;
                 }
             }
-            $user->update(['point'=>$point]);
+            if ($sum > 0) {
+                (new PointHistoryController)->create($user->id, $user->point, $sum, 'exchange', $count);
+                $user->increment('point', $sum);
+            }
         });
         return redirect()->route('user.gacha.end', ['token'=>$token]);
     }
@@ -657,8 +670,9 @@ class UserController extends Controller
         $user = auth()->user();
         DB::transaction(function () use ($user, $checks) {
             $logs = Product_log::where('user_id', $user->id)->where('status', 1)->lockForUpdate()->get();
-        
-            $point = $user->point;
+            $user = User::lockForUpdate()->find($user->id);
+            $count = 0;
+            $sum = 0;
             foreach($logs as $log) {
                 $key = "id" . $log->id;
                 if (isset($checks[$key]) && $checks[$key]) {
@@ -668,12 +682,14 @@ class UserController extends Controller
                         if ($product->is_lost_product > 0)
                             $product->increment('marks');
                     }
-                    (new PointHistoryController)->create($user->id, $point, $log->point, 'exchange', $log->id);
-                    $point = $point + $log->point;
+                    $sum = $sum + $log->point;
+                    $count = $count + 1;
                 }
             }
-    
-            $user->update(['point'=>$point]);
+            if ($sum > 0) {
+                (new PointHistoryController)->create($user->id, $user->point, $sum, 'exchange', $count);
+                $user->increment('point', $sum);
+            }
         });
         return redirect()->back()->with('message', '変換しました！')->with('title', 'ポイント変換')->with('type', 'dialog')->with('data', ['user' => $user]);
     }
