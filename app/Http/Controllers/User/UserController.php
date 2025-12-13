@@ -150,7 +150,6 @@ class UserController extends Controller
     }
 
     public function reward($user, $gacha, $number, $token) {
-        $user = User::lockForUpdate()->find($user->id);
         $result = 0;
         DB::transaction(function () use ($user, $gacha, $number, $token, &$result) {
             $gacha = Gacha::find($gacha->id);
@@ -476,7 +475,6 @@ class UserController extends Controller
         
         DB::transaction(function () use ($user, $checks, $token) {
             $logs = Product_log::where('gacha_record_id', $token)->where('user_id', $user->id)->where('status', 1)->lockForUpdate()->get();
-            $user = User::lockForUpdate()->find($user->id);
     
             $count = 0;
             $sum = 0;
@@ -670,7 +668,6 @@ class UserController extends Controller
         $user = auth()->user();
         DB::transaction(function () use ($user, $checks) {
             $logs = Product_log::where('user_id', $user->id)->where('status', 1)->lockForUpdate()->get();
-            $user = User::lockForUpdate()->find($user->id);
             $count = 0;
             $sum = 0;
             foreach($logs as $log) {
