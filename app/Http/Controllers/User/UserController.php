@@ -473,29 +473,33 @@ class UserController extends Controller
         $checks = $request->checks;
         $user = auth()->user();
         
-        DB::transaction(function () use ($user, $checks, $token) {
-            $logs = Product_log::where('gacha_record_id', $token)->where('user_id', $user->id)->where('status', 1)->lockForUpdate()->get();
-    
-            $count = 0;
-            $sum = 0;
-            foreach($logs as $log) {
-                $key = "id" . $log->id;
-                if (isset($checks[$key]) && $checks[$key]) {
-                    $log->status = 2;
-                    $log->save();
-                    if ($product = Product::find($log->product_id)) {
-                        if ($product->is_lost_product > 0)
-                            $product->increment('marks');
+        try {
+            DB::transaction(function () use ($user, $checks, $token) {
+                $logs = Product_log::where('gacha_record_id', $token)->where('user_id', $user->id)->where('status', 1)->lockForUpdate()->get();
+                
+                $count = 0;
+                $sum = 0;
+                foreach($logs as $log) {
+                    $key = "id" . $log->id;
+                    if (isset($checks[$key]) && $checks[$key]) {
+                        $log->status = 2;
+                        $log->save();
+                        if ($product = Product::find($log->product_id)) {
+                            if ($product->is_lost_product > 0)
+                                $product->increment('marks');
+                        }
+                        $sum = $sum + $log->point;
+                        $count = $count + 1;
                     }
-                    $sum = $sum + $log->point;
-                    $count = $count + 1;
                 }
-            }
-            if ($sum > 0) {
-                (new PointHistoryController)->create($user->id, $user->point, $sum, 'exchange', $count);
-                $user->increment('point', $sum);
-            }
-        });
+                if ($sum > 0) {
+                    (new PointHistoryController)->create($user->id, $user->point, $sum, 'exchange', $count);
+                    $user->increment('point', $sum);
+                }
+            });
+        } catch (Exception $e) {
+            return ;
+        }
         return redirect()->route('user.gacha.end', ['token'=>$token]);
     }
 
@@ -666,28 +670,32 @@ class UserController extends Controller
     public function product_point_exchange(Request $request) {
         $checks = $request->checks;
         $user = auth()->user();
-        DB::transaction(function () use ($user, $checks) {
-            $logs = Product_log::where('user_id', $user->id)->where('status', 1)->lockForUpdate()->get();
-            $count = 0;
-            $sum = 0;
-            foreach($logs as $log) {
-                $key = "id" . $log->id;
-                if (isset($checks[$key]) && $checks[$key]) {
-                    $log->status = 2;
-                    $log->save();
-                    if ($product = Product::find($log->product_id)) {
-                        if ($product->is_lost_product > 0)
-                            $product->increment('marks');
+        try {
+            DB::transaction(function () use ($user, $checks) {
+                $logs = Product_log::where('user_id', $user->id)->where('status', 1)->lockForUpdate()->get();
+                $count = 0;
+                $sum = 0;
+                foreach($logs as $log) {
+                    $key = "id" . $log->id;
+                    if (isset($checks[$key]) && $checks[$key]) {
+                        $log->status = 2;
+                        $log->save();
+                        if ($product = Product::find($log->product_id)) {
+                            if ($product->is_lost_product > 0)
+                                $product->increment('marks');
+                        }
+                        $sum = $sum + $log->point;
+                        $count = $count + 1;
                     }
-                    $sum = $sum + $log->point;
-                    $count = $count + 1;
                 }
-            }
-            if ($sum > 0) {
-                (new PointHistoryController)->create($user->id, $user->point, $sum, 'exchange', $count);
-                $user->increment('point', $sum);
-            }
-        });
+                if ($sum > 0) {
+                    (new PointHistoryController)->create($user->id, $user->point, $sum, 'exchange', $count);
+                    $user->increment('point', $sum);
+                }
+            });
+        } catch (Exception $e) {
+            return ;
+        }
         return redirect()->back()->with('message', '変換しました！')->with('title', 'ポイント変換')->with('type', 'dialog')->with('data', ['user' => $user]);
     }
 
