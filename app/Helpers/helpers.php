@@ -285,7 +285,7 @@ if ( ! function_exists('computeUserRank')){
         if ($user->month == $now) return $user;
         $rank = Rank::where('rank', $user->current_rank)->first();
 
-        if ($rank && $user->consume_point * 10 < $rank->limit * 3 && $user->current_rank > 1) {
+        if ($rank && $user->consume_point < $rank->keep_limit && $user->current_rank > 1) {
             $user->current_rank --;
         }
         $user->month = $now;

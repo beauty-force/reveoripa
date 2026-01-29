@@ -38,7 +38,7 @@ class ComputeUserRank extends Command
         foreach ($users as $user) {
             if ($user->month == $now) continue;
             $rank = Rank::where('rank', $user->current_rank)->first();
-            if ($user->consume_point * 10 < $rank->limit * 3 && $user->current_rank > 1) {
+            if ($user->consume_point < $rank->keep_limit && $user->current_rank > 1) {
                 $user->current_rank --;
             }
             $user->consume_point = 0;
