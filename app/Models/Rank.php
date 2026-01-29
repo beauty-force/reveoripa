@@ -14,6 +14,7 @@ class Rank extends Model
         'image',
         'badge',
         'limit',
+        'keep_limit',
         'bonus',
         'pt_rate',
         'dp_rate'

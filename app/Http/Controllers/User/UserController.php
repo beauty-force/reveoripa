@@ -920,7 +920,7 @@ class UserController extends Controller
 
     private function getRate($l, $L, $x) {
         if ($x <= 0) return 0;
-        if ($x >= $L) return 1;
+        if ($x >= $L) return 100;
 
         if ($l == 0) return $x*(2*$L-$x)/$L/$L*100;
         $base = $x / $L;
@@ -941,14 +941,14 @@ class UserController extends Controller
         $hide_cat_bar = 1;
         $current_rank = Rank::where('rank', $user->current_rank)->first();
         $next_rank = Rank::where('rank', '>', $user->current_rank)->orderby('rank')->first();
-        $limit = $current_rank->limit * 3 / 10;
+        $limit = $current_rank->keep_limit;
         if (!$next_rank || $next_rank->limit < 0) {
             $next_rank = $current_rank;
             $next_rank->limit *= 2;
         }
         $succeed = $user->consume_point >= $limit;
         $mark_pos = $limit == 0 ? 0 : 50;
-        $current_pos = $this->getRate($limit, $next_rank->limit, $user->consume_point);
+        $current_pos = $this->getRate($limit, max($next_rank->limit, $limit*2), $user->consume_point);
         return inertia('User/Profile', compact('hide_cat_bar', 'ranks', 'mark_pos', 'current_pos', 'succeed'));
     }
 }

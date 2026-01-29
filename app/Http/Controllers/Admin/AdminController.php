@@ -381,8 +381,9 @@ class AdminController extends Controller
         $point_logs = collect($grouped_logs)->values();
         $show_limit = 20;
         $rank = Rank::where('rank', $user->current_rank)->first()?->title;
+        $ranks = Rank::orderBy('rank', 'asc')->get(['rank', 'title']);
 
-        return inertia('Admin/Users/Detail', compact('user', 'profile', 'payments', 'coupons', 'hide_cat_bar', 'point_logs', 'show_limit', 'rank'));
+        return inertia('Admin/Users/Detail', compact('user', 'profile', 'payments', 'coupons', 'hide_cat_bar', 'point_logs', 'show_limit', 'rank', 'ranks'));
     }
 
     public function user_update(Request $request) {
@@ -390,13 +391,28 @@ class AdminController extends Controller
             
             $user = User::find($request->id);
             if ($user) {
+                $updateData = [];
+                
                 if (isset($request->point)) {
                     if ($user->point != $request->point) {
                         (new PointHistoryController)->create($user->id, $user->point, $request->point - $user->point, 'admin', 0);
                     }
-                    $user->update(['point' => $request->point]);
+                    $updateData['point'] = $request->point;
+                }
+                
+                if (isset($request->current_rank)) {
+                    $updateData['current_rank'] = $request->current_rank;
+                }
+                
+                if (isset($request->consume_point)) {
+                    $updateData['consume_point'] = $request->consume_point;
+                }
+                
+                if (!empty($updateData)) {
+                    $user->update($updateData);
                     return redirect()->back()->with('message', '保存しました！')->with('type', 'dialog');
                 }
+                
                 if (isset($request->status)) {
                     $user->update(['status' => $request->status]);
                     $message = '承認しました。';
