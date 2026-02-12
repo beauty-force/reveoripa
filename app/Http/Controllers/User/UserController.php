@@ -129,7 +129,7 @@ class UserController extends Controller
             $log->image = getProductImageUrl($log->image);
         }
         $gacha = $gacha->getDetail();
-        $gacha['products'] = Product::select('id', 'image', 'rank', 'is_last', 'rare', 'lost_type',
+        $gacha['products'] = Product::select('id', 'image', 'rank', 'is_last', 'rare', 'lost_type', 'show_count',
             DB::raw('category_id as marks'))
             ->where('gacha_id', $id)
             ->where('category_id', '>=', 0)

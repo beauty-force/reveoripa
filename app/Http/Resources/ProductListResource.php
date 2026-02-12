@@ -22,6 +22,7 @@ class ProductListResource extends JsonResource
             'dp'=>$this->dp,
             'rare'=>$this->rare,
             'marks'=>$this->marks,
+            'show_count'=>$this->show_count,
             'lost_type'=>$this->lost_type,
             // 'emission_percentage'=>$this->emission_percentage,
             'image'=>getProductImageUrl($this->image),

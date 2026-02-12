@@ -309,6 +309,7 @@ class GachaController extends Controller
             'rare' => $request->last_rare,
             'gacha_id' => $request->gacha_id,
             'lost_type' => $request->last_lost_type,
+            'show_count' => (int)($request->input('show_count', 0)),
             'is_last' => 1,
         ];
         if($request->last_image){
@@ -357,6 +358,7 @@ class GachaController extends Controller
             'rare' => $request->last_rare,
             'gacha_id' => $request->gacha_id,
             'marks' => $request->last_marks,
+            'show_count' => (int)($request->input('show_count', 0)),
             'order' => $request->last_order,
             'lost_type' => $request->last_lost_type,
             'is_last' => 0,

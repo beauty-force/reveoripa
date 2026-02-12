@@ -16,6 +16,7 @@ class Product extends Model
         // 'emission_percentage',
         'image',
         'marks',
+        'show_count',
         'lost_type',
         'is_last',
         'is_lost_product',  // 0-gacha product  1- gacha lost product 2-dp exchanger product
